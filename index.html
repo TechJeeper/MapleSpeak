@@ -111,6 +111,8 @@
             </div>
             
             <form id="suggestion-form" class="p-6 flex flex-col gap-4">
+                <p class="text-sm text-slate-500 mb-2">This will open a new GitHub Issue tab with your words pre-filled. Just click submit on the next page!</p>
+                
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Canadian Word/Phrase 🇨🇦</label>
                     <input type="text" id="suggest-can" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition-all" placeholder="e.g. runners">
@@ -120,18 +122,16 @@
                     <input type="text" id="suggest-us" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="e.g. sneakers">
                 </div>
                 
-                <div id="suggest-status" class="hidden text-sm font-medium py-2 px-3 rounded-lg text-center"></div>
-
                 <button type="submit" id="btn-submit-suggestion" class="mt-2 w-full bg-slate-800 text-white font-semibold py-3 rounded-lg hover:bg-slate-700 active:scale-[0.98] transition-all flex justify-center items-center gap-2">
-                    Submit Suggestion
+                    Open Issue in GitHub
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                 </button>
             </form>
         </div>
     </div>
 
     <script>
-        // --- GITHUB API CONFIGURATION ---
-        const GITHUB_TOKEN = "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"; 
+        // Only need the repo name now! No tokens!
         const GITHUB_REPO = "TechJeeper/MapleSpeak"; 
 
         // Dictionary Definition
@@ -287,8 +287,6 @@
         const suggestForm = document.getElementById('suggestion-form');
         const suggestCan = document.getElementById('suggest-can');
         const suggestUs = document.getElementById('suggest-us');
-        const btnSubmitSuggestion = document.getElementById('btn-submit-suggestion');
-        const suggestStatus = document.getElementById('suggest-status');
 
         // --- Core Translation Logic ---
         function escapeHTML(str) { return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
@@ -308,140 +306,4 @@
             let lastIndex = 0; let match;
 
             while ((match = regex.exec(text)) !== null) {
-                const originalWord = match[0];
-                const replacement = dict[originalWord.toLowerCase()];
-                if (replacement) {
-                    if (match.index > lastIndex) parts.push(text.substring(lastIndex, match.index));
-                    parts.push({ original: originalWord, translated: preserveCase(originalWord, replacement) });
-                    lastIndex = regex.lastIndex;
-                }
-            }
-            if (lastIndex < text.length) parts.push(text.substring(lastIndex));
-            return returnStringOnly ? parts.map(part => typeof part === 'string' ? part : part.translated).join('') : parts;
-        }
-
-        function updateOutput() {
-            const text = inputEl.value;
-            const parts = translateText(text);
-            currentPlainText = translateText(text, true);
-            btnCopy.disabled = !text.trim();
-
-            if (parts.length === 0) {
-                outputEl.innerHTML = '<span class="text-slate-400 italic">Translation will appear here...</span>';
-                return;
-            }
-
-            let html = '';
-            const highlightClass = direction === "CAN_TO_US" ? 'bg-blue-100 text-blue-900 border-blue-200 hover:bg-blue-200' : 'bg-red-100 text-red-900 border-red-200 hover:bg-red-200';
-            parts.forEach(part => {
-                if (typeof part === 'string') { html += escapeHTML(part); } 
-                else { html += `<span class="inline-block border-b-2 font-medium px-1 rounded-sm cursor-help transition-colors ${highlightClass}" title="Translated from: '${escapeHTML(part.original)}'">${escapeHTML(part.translated)}</span>`; }
-            });
-            outputEl.innerHTML = html;
-        }
-
-        function updateUI() {
-            if (direction === "CAN_TO_US") {
-                canIndicator.className = "flex items-center gap-3 px-6 py-3 rounded-xl border-2 transition-all bg-red-50 border-red-200 shadow-sm w-full sm:w-auto justify-center";
-                usIndicator.className = "flex items-center gap-3 px-6 py-3 rounded-xl border-2 transition-all bg-white border-slate-200 opacity-60 w-full sm:w-auto justify-center";
-                inputLabel.textContent = "Translate from Canadian";
-                outputLabel.textContent = "Translation to US";
-                inputEl.placeholder = "Type some Canadian text here...";
-            } else {
-                usIndicator.className = "flex items-center gap-3 px-6 py-3 rounded-xl border-2 transition-all bg-blue-50 border-blue-200 shadow-sm w-full sm:w-auto justify-center";
-                canIndicator.className = "flex items-center gap-3 px-6 py-3 rounded-xl border-2 transition-all bg-white border-slate-200 opacity-60 w-full sm:w-auto justify-center";
-                inputLabel.textContent = "Translate from US";
-                outputLabel.textContent = "Translation to Canadian";
-                inputEl.placeholder = "Type some American text here...";
-            }
-        }
-
-        // --- Event Listeners ---
-        inputEl.addEventListener('input', updateOutput);
-
-        btnSwap.addEventListener('click', () => {
-            direction = direction === "CAN_TO_US" ? "US_TO_CAN" : "CAN_TO_US";
-            inputEl.value = currentPlainText; 
-            updateUI(); updateOutput();
-        });
-
-        btnRandom.addEventListener('click', () => {
-            const randomEx = examples[Math.floor(Math.random() * examples.length)];
-            if (direction === "US_TO_CAN") {
-                const tempDir = direction; direction = "CAN_TO_US";
-                inputEl.value = translateText(randomEx, true);
-                direction = tempDir;
-            } else { inputEl.value = randomEx; }
-            updateOutput();
-        });
-
-        // --- Modal & GitHub API Logic ---
-        function showStatus(message, isError = false) {
-            suggestStatus.textContent = message;
-            suggestStatus.classList.remove('hidden');
-            suggestStatus.className = `block text-sm font-medium py-2 px-3 rounded-lg text-center ${isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`;
-        }
-
-        btnSuggestOpen.addEventListener('click', () => {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            suggestStatus.classList.add('hidden');
-            suggestForm.reset();
-        });
-
-        const closeModal = () => {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        };
-
-        btnSuggestClose.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-
-        suggestForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const canWord = suggestCan.value.trim();
-            const usWord = suggestUs.value.trim();
-
-            if (!canWord || !usWord) return;
-
-            btnSubmitSuggestion.disabled = true;
-            btnSubmitSuggestion.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Submitting...`;
-
-            try {
-                const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/issues`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${GITHUB_TOKEN}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        title: `Translation Suggestion: ${canWord} -> ${usWord}`,
-                        body: `### New Translation Suggestion 🍁\n\n**Canadian Word:** ${canWord}\n**US Translation:** ${usWord}\n\n*Submitted via MapleSpeak Web App*`,
-                        labels: ["enhancement", "suggestion"]
-                    })
-                });
-
-                if (response.ok) {
-                    showStatus("Suggestion submitted successfully! Thanks!");
-                    setTimeout(closeModal, 2000);
-                } else {
-                    const errData = await response.json();
-                    throw new Error(errData.message || "Failed to create issue");
-                }
-            } catch (error) {
-                console.error("GitHub API Error:", error);
-                showStatus(`Error: Check your Repo/Token settings.`, true);
-            } finally {
-                btnSubmitSuggestion.disabled = false;
-                btnSubmitSuggestion.textContent = "Submit Suggestion";
-            }
-        });
-
-        // Initialize
-        btnRandom.click();
-    </script>
-</body>
-</html>
-
-
+               
