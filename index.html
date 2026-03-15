@@ -19,6 +19,7 @@
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-red-200">
 
+    <!-- Header -->
     <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-10">
         <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3">
@@ -41,8 +42,10 @@
         </div>
     </header>
 
+    <!-- Main Content -->
     <main class="max-w-6xl mx-auto px-4 py-8">
         
+        <!-- Controls -->
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
             <div id="can-indicator" class="flex items-center gap-3 px-6 py-3 rounded-xl border-2 transition-all bg-red-50 border-red-200 shadow-sm w-full sm:w-auto justify-center">
                 <span class="text-3xl">🇨🇦</span>
@@ -59,8 +62,10 @@
             </div>
         </div>
 
+        <!-- Translation Areas -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch min-h-[400px]">
             
+            <!-- Input Area -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden focus-within:ring-2 focus-within:ring-slate-400 transition-all">
                 <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
                     <span id="input-label" class="font-semibold text-slate-600 uppercase tracking-wider text-xs">
@@ -70,6 +75,7 @@
                 <textarea id="input-text" class="flex-1 w-full p-6 text-lg resize-none outline-none bg-transparent placeholder-slate-400 min-h-[200px] lg:min-h-0" placeholder="Type some Canadian text here..." spellcheck="false"></textarea>
             </div>
 
+            <!-- Output Area -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden relative group">
                 <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
                     <span id="output-label" class="font-semibold text-slate-600 uppercase tracking-wider text-xs">
@@ -94,6 +100,7 @@
         </div>
     </main>
 
+    <!-- Suggestion Modal -->
     <div id="suggestion-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col">
             <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex justify-between items-center">
@@ -124,7 +131,7 @@
 
     <script>
         // --- GITHUB API CONFIGURATION ---
-        const GITHUB_TOKEN = "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"; 
+        const GITHUB_TOKEN = "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"; 
         const GITHUB_REPO = "TechJeeper/MapleSpeak"; 
 
         // Dictionary Definition
@@ -436,3 +443,5 @@
     </script>
 </body>
 </html>
+
+
