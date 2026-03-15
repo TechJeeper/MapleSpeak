@@ -1,0 +1,365 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { ArrowRightLeft, Copy, RefreshCw, Check, Info } from 'lucide-react';
+
+// Comprehensive Canadian to US Dictionary
+const canToUsDictionary = {
+  // Spelling differences
+  "colour": "color",
+  "colours": "colors",
+  "flavour": "flavor",
+  "flavours": "flavors",
+  "neighbour": "neighbor",
+  "neighbours": "neighbors",
+  "harbour": "harbor",
+  "harbours": "harbors",
+  "behaviour": "behavior",
+  "behaviours": "behaviors",
+  "favour": "favor",
+  "favours": "favors",
+  "centre": "center",
+  "centres": "centers",
+  "theatre": "theater",
+  "theatres": "theaters",
+  "metre": "meter",
+  "metres": "meters",
+  "fibre": "fiber",
+  "fibres": "fibers",
+  "litre": "liter",
+  "litres": "liters",
+  "travelling": "traveling",
+  "travelled": "traveled",
+  "cancelled": "canceled",
+  "cancelling": "canceling",
+  "defence": "defense",
+  "offence": "offense",
+  "cheque": "check",
+  "cheques": "checks",
+  "grey": "gray",
+  "smoulder": "smolder",
+  "mould": "mold",
+  "moustache": "mustache",
+  "plough": "plow",
+
+  // Idioms and Vocabulary
+  "washroom": "restroom",
+  "washrooms": "restrooms",
+  "tuque": "beanie",
+  "tuques": "beanies",
+  "toque": "beanie",
+  "toques": "beanies",
+  "two-four": "24-pack of beer",
+  "mickey": "flask of liquor",
+  "twenty-sixer": "fifth of liquor",
+  "two-six": "fifth of liquor",
+  "pencil crayons": "colored pencils",
+  "pencil crayon": "colored pencil",
+  "eavestrough": "gutter",
+  "eavestroughs": "gutters",
+  "garburator": "garbage disposal",
+  "garburators": "garbage disposals",
+  "homo milk": "whole milk",
+  "hydro": "electricity",
+  "parkade": "parking garage",
+  "parkades": "parking garages",
+  "runners": "sneakers",
+  "bunnyhug": "hoodie",
+  "bunnyhugs": "hoodies",
+  "chesterfield": "couch",
+  "chesterfields": "couches",
+  "freezie": "freeze pop",
+  "freezies": "freeze pops",
+  "keener": "try-hard",
+  "keeners": "try-hards",
+  "kerfuffle": "commotion",
+  "klick": "kilometer",
+  "klicks": "kilometers",
+  "loonie": "dollar coin",
+  "loonies": "dollar coins",
+  "toonie": "two-dollar coin",
+  "toonies": "two-dollar coins",
+  "serviette": "napkin",
+  "serviettes": "napkins",
+  "zed": "zee",
+  "postal code": "zip code",
+  "postal codes": "zip codes",
+  "double-double": "coffee with two creams and two sugars",
+  "pop": "soda",
+  "biffy": "outhouse",
+  "gitch": "underwear",
+  "gotch": "underwear",
+  "lineup": "line",
+  "lineups": "lines",
+  "icing sugar": "powdered sugar",
+  "whitener": "coffee creamer",
+  "bachelor apartment": "studio apartment",
+  "firehall": "fire station",
+  "facecloth": "washcloth",
+  "cutlery": "silverware",
+  "e-transfer": "Venmo/Zelle",
+  "e-transfers": "Venmo/Zelle transfers",
+  "give'r": "go for it",
+  "snowbirds": "winter retirees",
+  "dart": "cigarette",
+  "darts": "cigarettes"
+};
+
+// Auto-generate the reverse dictionary
+const usToCanDictionary = Object.entries(canToUsDictionary).reduce((acc, [can, us]) => {
+  // Avoid overwriting if multiple CAN words map to the same US word (keep the most common/first one)
+  if (!acc[us]) {
+    acc[us] = can;
+  }
+  return acc;
+}, {});
+
+// Example sentences for the randomizer
+const examples = [
+  "I went to the parkade, but I forgot my tuque on the chesterfield.",
+  "Can you grab me a two-four of pop and some pencil crayons?",
+  "The centre is painted grey, but I love that colour.",
+  "What a kerfuffle! I dropped my loonie and toonie in the eavestrough.",
+  "I'm drinking homo milk and eating a freezie in the washroom.",
+  "The keener ran five klicks in his new runners.",
+  "Just e-transfer me for the double-double and we'll call it even."
+];
+
+export default function App() {
+  const [inputText, setInputText] = useState("");
+  const [direction, setDirection] = useState("CAN_TO_US");
+  const [copied, setCopied] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Load initial example
+    loadRandomExample();
+  }, []);
+
+  const loadRandomExample = () => {
+    const randomEx = examples[Math.floor(Math.random() * examples.length)];
+    if (direction === "US_TO_CAN") {
+      // Translate the example to US first so the user sees US input
+      const tempTranslated = translateText(randomEx, "CAN_TO_US", true);
+      setInputText(tempTranslated);
+    } else {
+      setInputText(randomEx);
+    }
+  };
+
+  const handleSwap = () => {
+    setDirection(prev => prev === "CAN_TO_US" ? "US_TO_CAN" : "CAN_TO_US");
+    // Swap the current translated output back into the input
+    const currentTranslatedText = getPlainText(translatedParts);
+    setInputText(currentTranslatedText);
+  };
+
+  const copyToClipboard = () => {
+    const textToCopy = getPlainText(translatedParts);
+    if ('clipboard' in navigator) {
+      navigator.clipboard.writeText(textToCopy);
+    } else {
+      document.execCommand('copy', true, textToCopy);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Helper to preserve casing during translation
+  const preserveCase = (original, replacement) => {
+    if (original === original.toUpperCase() && original.length > 1) {
+      return replacement.toUpperCase();
+    }
+    if (original[0] === original[0].toUpperCase()) {
+      return replacement.charAt(0).toUpperCase() + replacement.slice(1);
+    }
+    return replacement.toLowerCase();
+  };
+
+  // Tokenize and translate text, returning an array of string and highlighted objects
+  const translateText = (text, currentDirection, returnStringOnly = false) => {
+    if (!text.trim()) return returnStringOnly ? "" : [];
+
+    const dict = currentDirection === "CAN_TO_US" ? canToUsDictionary : usToCanDictionary;
+    const keys = Object.keys(dict).sort((a, b) => b.length - a.length);
+    
+    // Escape special regex characters
+    const escapedKeys = keys.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    // Build regex to match whole words/phrases case-insensitively
+    const regex = new RegExp(`\\b(${escapedKeys.join('|')})\\b`, 'gi');
+
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+      const originalWord = match[0];
+      const lowerWord = originalWord.toLowerCase();
+      const replacement = dict[lowerWord];
+
+      if (replacement) {
+        if (match.index > lastIndex) {
+          parts.push(text.substring(lastIndex, match.index));
+        }
+
+        parts.push({
+          original: originalWord,
+          translated: preserveCase(originalWord, replacement)
+        });
+
+        lastIndex = regex.lastIndex;
+      }
+    }
+
+    if (lastIndex < text.length) {
+      parts.push(text.substring(lastIndex));
+    }
+
+    if (returnStringOnly) {
+      return parts.map(part => typeof part === 'string' ? part : part.translated).join('');
+    }
+
+    return parts;
+  };
+
+  const getPlainText = (partsArray) => {
+    return partsArray.map(part => typeof part === 'string' ? part : part.translated).join('');
+  };
+
+  const translatedParts = useMemo(() => {
+    return translateText(inputText, direction);
+  }, [inputText, direction]);
+
+  if (!mounted) return null;
+
+  const isCanToUs = direction === "CAN_TO_US";
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-red-200">
+      {/* Header */}
+      <header className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-10">
+        <div className="max-w-6xl mx-auto px-4 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="text-4xl bg-gradient-to-br from-red-500 to-red-700 text-transparent bg-clip-text font-black tracking-tight flex items-center gap-2">
+              🍁 MapleSpeak
+            </div>
+            <span className="hidden sm:inline-block px-3 py-1 bg-slate-100 rounded-full text-xs font-semibold text-slate-500 tracking-wider uppercase">
+              The Canuck Converter
+            </span>
+          </div>
+          <button 
+            onClick={loadRandomExample}
+            className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-red-600 transition-colors bg-slate-100 hover:bg-red-50 px-4 py-2 rounded-lg"
+          >
+            <RefreshCw size={16} />
+            Random Example
+          </button>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-6xl mx-auto px-4 py-8">
+        
+        {/* Controls */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+          <div className={`flex items-center gap-3 px-6 py-3 rounded-xl border-2 transition-all ${isCanToUs ? 'bg-red-50 border-red-200 shadow-sm' : 'bg-white border-slate-200 opacity-60'}`}>
+            <span className="text-3xl">🇨🇦</span>
+            <span className="font-bold text-slate-700">Canadian English</span>
+          </div>
+          
+          <button 
+            onClick={handleSwap}
+            className="p-4 bg-slate-800 text-white rounded-full hover:bg-slate-700 hover:scale-105 active:scale-95 transition-all shadow-lg z-10 -my-4 sm:my-0 sm:-mx-6"
+            title="Swap Languages"
+          >
+            <ArrowRightLeft size={24} />
+          </button>
+
+          <div className={`flex items-center gap-3 px-6 py-3 rounded-xl border-2 transition-all ${!isCanToUs ? 'bg-blue-50 border-blue-200 shadow-sm' : 'bg-white border-slate-200 opacity-60'}`}>
+            <span className="text-3xl">🇺🇸</span>
+            <span className="font-bold text-slate-700">US English</span>
+          </div>
+        </div>
+
+        {/* Translation Areas */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch min-h-[400px]">
+          
+          {/* Input Area */}
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden focus-within:ring-2 focus-within:ring-slate-400 transition-all">
+            <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
+              <span className="font-semibold text-slate-600 uppercase tracking-wider text-xs">
+                Translate from {isCanToUs ? 'Canadian' : 'US'}
+              </span>
+            </div>
+            <textarea
+              className="flex-1 w-full p-6 text-lg resize-none outline-none bg-transparent placeholder-slate-400"
+              placeholder={`Type some ${isCanToUs ? 'Canadian' : 'American'} text here...`}
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              spellCheck="false"
+            />
+          </div>
+
+          {/* Output Area */}
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden relative group">
+            <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
+              <span className="font-semibold text-slate-600 uppercase tracking-wider text-xs">
+                Translation to {!isCanToUs ? 'Canadian' : 'US'}
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-400 hidden sm:inline-flex items-center gap-1">
+                  <Info size={12} /> Hover highlighted words
+                </span>
+                <button
+                  onClick={copyToClipboard}
+                  disabled={!inputText.trim()}
+                  className={`p-1.5 rounded-md transition-colors ${copied ? 'bg-green-100 text-green-700' : 'hover:bg-slate-200 text-slate-500'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                  title="Copy to clipboard"
+                >
+                  {copied ? <Check size={18} /> : <Copy size={18} />}
+                </button>
+              </div>
+            </div>
+            
+            <div className="flex-1 p-6 text-lg overflow-auto whitespace-pre-wrap leading-relaxed text-slate-800">
+              {translatedParts.length === 0 ? (
+                <span className="text-slate-400 italic">Translation will appear here...</span>
+              ) : (
+                translatedParts.map((part, i) => {
+                  if (typeof part === 'string') {
+                    return <span key={i}>{part}</span>;
+                  }
+                  
+                  // Highlighted translated word
+                  const highlightColor = isCanToUs 
+                    ? 'bg-blue-100 text-blue-900 border-blue-200 hover:bg-blue-200' // US output colors
+                    : 'bg-red-100 text-red-900 border-red-200 hover:bg-red-200'; // CAN output colors
+
+                  return (
+                    <span 
+                      key={i} 
+                      className={`inline-block border-b-2 font-medium px-1 rounded-sm cursor-help transition-colors ${highlightColor}`}
+                      title={`Translated from: "${part.original}"`}
+                    >
+                      {part.translated}
+                    </span>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Fun Facts / Footer */}
+        <div className="mt-12 text-center text-slate-500 text-sm">
+          <p className="mb-2">
+            Did you know? Canadians say <strong>"zed"</strong> instead of <strong>"zee"</strong>, and wear a <strong>"tuque"</strong> in the winter! ❄️
+          </p>
+          <p>
+            Made with 🍁 maple syrup and lots of ❤️
+          </p>
+        </div>
+      </main>
+    </div>
+  );
+}
+
