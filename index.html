@@ -25,7 +25,6 @@
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-red-200">
 
-    <!-- Header -->
     <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-10">
         <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3">
@@ -43,10 +42,8 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="max-w-6xl mx-auto px-4 py-8">
         
-        <!-- Controls -->
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
             <div id="can-indicator" class="flex items-center gap-3 px-6 py-3 rounded-xl border-2 transition-all bg-red-50 border-red-200 shadow-sm w-full sm:w-auto justify-center">
                 <span class="text-3xl">🇨🇦</span>
@@ -63,10 +60,8 @@
             </div>
         </div>
 
-        <!-- Translation Areas -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch min-h-[400px]">
             
-            <!-- Input Area -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden focus-within:ring-2 focus-within:ring-slate-400 transition-all">
                 <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
                     <span id="input-label" class="font-semibold text-slate-600 uppercase tracking-wider text-xs">
@@ -76,7 +71,6 @@
                 <textarea id="input-text" class="flex-1 w-full p-6 text-lg resize-none outline-none bg-transparent placeholder-slate-400 min-h-[200px] lg:min-h-0" placeholder="Type some Canadian text here..." spellcheck="false"></textarea>
             </div>
 
-            <!-- Output Area -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden relative group">
                 <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
                     <span id="output-label" class="font-semibold text-slate-600 uppercase tracking-wider text-xs">
@@ -100,7 +94,6 @@
             </div>
         </div>
 
-        <!-- Fun Facts / Footer -->
         <div class="mt-12 text-center text-slate-500 text-sm px-4">
             <p class="mb-2">
                 Did you know? Canadians say <strong>"zed"</strong> instead of <strong>"zee"</strong>, and wear a <strong>"tuque"</strong> in the winter! ❄️
@@ -112,34 +105,103 @@
     </main>
 
     <script>
-        // Dictionary Definition
+        // Expanded Dictionary Definition
         const canToUsDictionary = {
-            "colour": "color", "colours": "colors", "flavour": "flavor", "flavours": "flavors",
-            "neighbour": "neighbor", "neighbours": "neighbors", "harbour": "harbor", "harbours": "harbors",
-            "behaviour": "behavior", "behaviours": "behaviors", "favour": "favor", "favours": "favors",
-            "centre": "center", "centres": "centers", "theatre": "theater", "theatres": "theaters",
-            "metre": "meter", "metres": "meters", "fibre": "fiber", "fibres": "fibers",
-            "litre": "liter", "litres": "liters", "travelling": "traveling", "travelled": "traveled",
-            "cancelled": "canceled", "cancelling": "canceling", "defence": "defense", "offence": "offense",
-            "cheque": "check", "cheques": "checks", "grey": "gray", "smoulder": "smolder",
-            "mould": "mold", "moustache": "mustache", "plough": "plow", "washroom": "restroom",
-            "washrooms": "restrooms", "tuque": "beanie", "tuques": "beanies", "toque": "beanie",
-            "toques": "beanies", "two-four": "24-pack of beer", "mickey": "flask of liquor",
-            "twenty-sixer": "fifth of liquor", "two-six": "fifth of liquor", "pencil crayons": "colored pencils",
-            "pencil crayon": "colored pencil", "eavestrough": "gutter", "eavestroughs": "gutters",
-            "garburator": "garbage disposal", "garburators": "garbage disposals", "homo milk": "whole milk",
-            "hydro": "electricity", "parkade": "parking garage", "parkades": "parking garages",
-            "runners": "sneakers", "bunnyhug": "hoodie", "bunnyhugs": "hoodies", "chesterfield": "couch",
-            "chesterfields": "couches", "freezie": "freeze pop", "freezies": "freeze pops",
-            "keener": "try-hard", "keeners": "try-hards", "kerfuffle": "commotion", "klick": "kilometer",
-            "klicks": "kilometers", "loonie": "dollar coin", "loonies": "dollar coins", "toonie": "two-dollar coin",
-            "toonies": "two-dollar coins", "serviette": "napkin", "serviettes": "napkins", "zed": "zee",
-            "postal code": "zip code", "postal codes": "zip codes", "double-double": "coffee with two creams and two sugars",
-            "pop": "soda", "biffy": "outhouse", "gitch": "underwear", "gotch": "underwear",
-            "lineup": "line", "lineups": "lines", "icing sugar": "powdered sugar", "whitener": "coffee creamer",
-            "bachelor apartment": "studio apartment", "firehall": "fire station", "facecloth": "washcloth",
-            "cutlery": "silverware", "e-transfer": "Venmo/Zelle", "e-transfers": "Venmo/Zelle transfers",
-            "give'r": "go for it", "snowbirds": "winter retirees", "dart": "cigarette", "darts": "cigarettes"
+            // Spelling differences
+            "colour": "color", "colours": "colors", 
+            "flavour": "flavor", "flavours": "flavors", "flavouring": "flavoring",
+            "neighbour": "neighbor", "neighbours": "neighbors", 
+            "harbour": "harbor", "harbours": "harbors",
+            "behaviour": "behavior", "behaviours": "behaviors", 
+            "favour": "favor", "favours": "favors",
+            "centre": "center", "centres": "centers", 
+            "theatre": "theater", "theatres": "theaters",
+            "metre": "meter", "metres": "meters", 
+            "fibre": "fiber", "fibres": "fibers",
+            "litre": "liter", "litres": "liters", 
+            "travelling": "traveling", "travelled": "traveled",
+            "cancelled": "canceled", "cancelling": "canceling", 
+            "defence": "defense", "offence": "offense",
+            "cheque": "check", "cheques": "checks", 
+            "grey": "gray", "smoulder": "smolder",
+            "mould": "mold", "moustache": "mustache", "plough": "plow",
+            "savour": "savor", "savouring": "savoring", "savours": "savors", "savoured": "savored",
+            "valour": "valor", "rigour": "rigor", "vigour": "vigor",
+            "armour": "armor", "armoured": "armored",
+            "endeavour": "endeavor", "endeavours": "endeavors", "endeavoured": "endeavored",
+            "jeweller": "jeweler", "jewellers": "jewelers", "jewellery": "jewelry",
+            "marvellous": "marvelous", "pyjamas": "pajamas",
+            "catalogue": "catalog", "catalogues": "catalogs",
+            "dialogue": "dialog", "dialogues": "dialogs",
+
+            // Idioms and Vocabulary
+            "washroom": "restroom", "washrooms": "restrooms", 
+            "tuque": "beanie", "tuques": "beanies", 
+            "toque": "beanie", "toques": "beanies", 
+            "two-four": "24-pack of beer", 
+            "mickey": "flask of liquor",
+            "twenty-sixer": "fifth of liquor", "two-six": "fifth of liquor", 
+            "pencil crayons": "colored pencils", "pencil crayon": "colored pencil", 
+            "eavestrough": "gutter", "eavestroughs": "gutters",
+            "garburator": "garbage disposal", "garburators": "garbage disposals", 
+            "hydro": "electricity", "hydro bill": "electric bill",
+            "parkade": "parking garage", "parkades": "parking garages",
+            "runners": "sneakers", 
+            "bunnyhug": "hoodie", "bunnyhugs": "hoodies", 
+            "chesterfield": "couch", "chesterfields": "couches", 
+            "freezie": "freeze pop", "freezies": "freeze pops",
+            "keener": "try-hard", "keeners": "try-hards", 
+            "kerfuffle": "commotion", 
+            "klick": "kilometer", "klicks": "kilometers", 
+            "loonie": "dollar coin", "loonies": "dollar coins", 
+            "toonie": "two-dollar coin", "toonies": "two-dollar coins", 
+            "serviette": "napkin", "serviettes": "napkins", 
+            "zed": "zee",
+            "postal code": "zip code", "postal codes": "zip codes", 
+            "double-double": "coffee with two creams and two sugars",
+            "pop": "soda", 
+            "biffy": "outhouse", 
+            "gitch": "underwear", "gotch": "underwear",
+            "lineup": "line", "lineups": "lines", 
+            "icing sugar": "powdered sugar", 
+            "whitener": "coffee creamer",
+            "bachelor apartment": "studio apartment", 
+            "firehall": "fire station", 
+            "facecloth": "washcloth", "facecloths": "washcloths",
+            "cutlery": "silverware", 
+            "e-transfer": "Venmo/Zelle", "e-transfers": "Venmo/Zelle transfers",
+            "give'r": "go for it", 
+            "snowbirds": "winter retirees", 
+            "dart": "cigarette", "darts": "cigarettes",
+            "kraft dinner": "macaroni and cheese", "kd": "mac and cheese",
+            "elastic": "rubber band", "elastics": "rubber bands",
+            "gas bar": "gas station", "gas bars": "gas stations",
+            "grade one": "first grade", "grade two": "second grade", "grade three": "third grade",
+            "housecoat": "bathrobe", "housecoats": "bathrobes",
+            "peameal bacon": "Canadian bacon", "back bacon": "Canadian bacon",
+            "pylon": "traffic cone", "pylons": "traffic cones",
+            "riding": "electoral district", "ridings": "electoral districts",
+            "robertson screw": "square-head screw", "robertson screwdriver": "square-head screwdriver",
+            "scribbler": "notebook", "scribblers": "notebooks",
+            "ski-doo": "snowmobile", "ski-doos": "snowmobiles",
+            "stag": "bachelor party", "stagette": "bachelorette party",
+            "tap": "faucet", "taps": "faucets",
+            "tea towel": "dish towel", "tea towels": "dish towels",
+            "timmies": "Tim Hortons", "tim hortons": "Dunkin' Donuts",
+            "toboggan": "sled", "toboggans": "sleds",
+            "transport truck": "semi-truck", "transport trucks": "semi-trucks",
+            "university": "college",
+            "wicket": "ticket window", "wickets": "ticket windows",
+            "cheezies": "cheese puffs",
+            "bank machine": "ATM", "bank machines": "ATMs",
+            "brown bread": "whole wheat bread",
+            "corner store": "convenience store", "corner stores": "convenience stores",
+            "fire route": "fire lane",
+            "garbage tin": "trash can", "garbage tins": "trash cans",
+            "knapsack": "backpack", "knapsacks": "backpacks",
+            "return ticket": "round-trip ticket",
+            "soft drink": "soda", "soft drinks": "sodas",
+            "taxi stand": "cab stand", "zamboni": "ice resurfacer"
         };
 
         // Auto-generate reverse dictionary
@@ -153,9 +215,12 @@
             "Can you grab me a two-four of pop and some pencil crayons?",
             "The centre is painted grey, but I love that colour.",
             "What a kerfuffle! I dropped my loonie and toonie in the eavestrough.",
-            "I'm drinking homo milk and eating a freezie in the washroom.",
+            "I'm eating Kraft Dinner and some freezies in the washroom.",
             "The keener ran five klicks in his new runners.",
-            "Just e-transfer me for the double-double and we'll call it even."
+            "Just e-transfer me for the double-double and we'll call it even.",
+            "Grab your bunnyhug and knapsack, we're going to the corner store.",
+            "I spilled icing sugar on my pyjamas while watching the game.",
+            "Don't forget to pay the hydro bill before you go to the stag."
         ];
 
         // State
@@ -340,4 +405,3 @@
     </script>
 </body>
 </html>
-
